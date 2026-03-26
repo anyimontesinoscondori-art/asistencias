@@ -6,6 +6,14 @@
 2. Configura .env
 3. npm run dev
 
+## Variables de entorno
+
+- SUPABASE_URL
+- SUPABASE_ANON_KEY
+- QR_SECRET (cualquier texto secreto)
+- QR_TOKEN_TTL_MS (opcional, por defecto 7200000)
+
 ## Rutas
+
 / -> alumnos
 /mnosecocosable (o /admin) -> admin

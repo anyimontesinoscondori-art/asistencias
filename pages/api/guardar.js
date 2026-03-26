@@ -1,33 +1,48 @@
 import { createClient } from "@supabase/supabase-js";
-import { tokenActual } from "./token";
+import { verifyQrToken } from "../../lib/qrToken";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const supabaseUrl =
+  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey =
+  process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
-  const { nombre, token } = req.body;
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ msg: "Falta configurar Supabase" });
+  }
 
-  if (token !== tokenActual) {
-    return res.json({ msg: "QR expirado ❌" });
+  const { nombre, token } = req.body || {};
+
+  if (!nombre || !token) {
+    return res.status(400).json({ msg: "Faltan datos" });
+  }
+
+  const verif = verifyQrToken(token);
+  if (!verif.ok) {
+    return res.status(400).json({ msg: "QR expirado o invalido" });
   }
 
   const hoy = new Date().toISOString().split("T")[0];
 
-  const { data: existente } = await supabase
+  const { data: existente, error: errorExistente } = await supabase
     .from("asistencia")
     .select("*")
     .eq("nombre", nombre)
     .eq("fecha", hoy);
 
+  if (errorExistente) {
+    return res.status(500).json({ msg: "Error consultando asistencia" });
+  }
+
   if (existente.length > 0) {
-    return res.json({ msg: "Ya registrado ❌" });
+    return res.json({ msg: "Ya registrado" });
   }
 
   const now = new Date();
 
-  await supabase.from("asistencia").insert([
+  const { error: errorInsert } = await supabase.from("asistencia").insert([
     {
       nombre,
       fecha: hoy,
@@ -36,5 +51,9 @@ export default async function handler(req, res) {
     }
   ]);
 
-  res.json({ msg: "Registrado ✅" });
+  if (errorInsert) {
+    return res.status(500).json({ msg: "Error guardando asistencia" });
+  }
+
+  res.json({ msg: "Registrado" });
 }

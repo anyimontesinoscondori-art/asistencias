@@ -1,8 +1,10 @@
-let tokenActual = "";
+import { createQrToken } from "../../lib/qrToken";
 
 export default function handler(req, res) {
-  tokenActual = Math.random().toString(36).substring(2, 10);
-  res.json({ token: tokenActual });
+  try {
+    const token = createQrToken();
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ msg: "Falta configurar QR_SECRET" });
+  }
 }
-
-export { tokenActual };
