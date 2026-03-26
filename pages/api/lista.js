@@ -18,7 +18,9 @@ export default async function handler(req, res) {
     .order("fecha", { ascending: false });
 
   if (error) {
-    return res.status(500).json({ msg: "Error obteniendo lista" });
+    return res
+      .status(500)
+      .json({ msg: "Error obteniendo lista", error: error.message });
   }
 
   res.json(data);

@@ -33,7 +33,10 @@ export default async function handler(req, res) {
     .eq("fecha", hoy);
 
   if (errorExistente) {
-    return res.status(500).json({ msg: "Error consultando asistencia" });
+    return res.status(500).json({
+      msg: "Error consultando asistencia",
+      error: errorExistente.message
+    });
   }
 
   if (existente.length > 0) {
@@ -52,7 +55,10 @@ export default async function handler(req, res) {
   ]);
 
   if (errorInsert) {
-    return res.status(500).json({ msg: "Error guardando asistencia" });
+    return res.status(500).json({
+      msg: "Error guardando asistencia",
+      error: errorInsert.message
+    });
   }
 
   res.json({ msg: "Registrado" });
