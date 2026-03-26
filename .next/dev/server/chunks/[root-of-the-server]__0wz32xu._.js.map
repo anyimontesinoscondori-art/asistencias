@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 16, "column": 0}, "map": {"version":3,"sources":["file:///C:/imagenes%20juan/asistencia/asistencia-qr-pro%20%281%29/pages/api/token.js"],"sourcesContent":["let tokenActual = \"\";\n\nexport default function handler(req, res) {\n  tokenActual = Math.random().toString(36).substring(2, 10);\n  res.json({ token: tokenActual });\n}\n\nexport { tokenActual };"],"names":["tokenActual","handler","req","res","Math","random","toString","substring","json","token"],"mappings":";;;;;;AAAA,IAAIA,cAAc;AAEH,SAASC,QAAQC,GAAG,EAAEC,GAAG;IACtCH,cAAcI,KAAKC,MAAM,GAAGC,QAAQ,CAAC,IAAIC,SAAS,CAAC,GAAG;IACtDJ,IAAIK,IAAI,CAAC;QAAEC,OAAOT;IAAY;AAChC"}}]
+}
