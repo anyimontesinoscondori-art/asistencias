@@ -1,11 +1,11 @@
 # Sistema de Asistencia QR
 
-## Instalación
+## Instalacion
 
 1. npm install
 2. Configura .env
 3. npm run dev
 
 ## Rutas
-/ → alumnos
-/admin → admin
+/ -> alumnos
+/mnosecocosable (o /admin) -> admin
