@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     }
 
     if (existenteDevice.length > 0) {
-      return res.json({ msg: "Este celular ya registro hoy" });
+      return res.json({ msg: "hola ya te registraste hoy " });
     }
 
     const now = new Date();
