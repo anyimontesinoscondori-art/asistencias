@@ -36,6 +36,13 @@ export default function Home() {
 
     const data = await res.json();
     alert(data.msg);
+
+    if (res.ok) {
+      window.close();
+      setTimeout(() => {
+        window.location.href = "about:blank";
+      }, 300);
+    }
   };
 
   return (
