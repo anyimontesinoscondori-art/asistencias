@@ -43,7 +43,7 @@ export default function Home() {
         <h2 style={{ textAlign: "center" }}>Asistencia</h2>
 
         <input
-          placeholder="Tu nombre"
+          placeholder="Tu nombre¡"
           onChange={(e) => setNombre(e.target.value)}
           style={{
             width: "100%",
