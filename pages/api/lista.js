@@ -12,16 +12,31 @@ export default async function handler(req, res) {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  const { data, error } = await supabase
-    .from("asistencia")
-    .select("*")
-    .order("fecha", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("asistencia")
+      .select("*")
+      .order("fecha", { ascending: false });
 
-  if (error) {
-    return res
-      .status(500)
-      .json({ msg: "Error obteniendo lista", error: error.message });
+    if (error) {
+      return res
+        .status(500)
+        .json({ msg: "Error obteniendo lista", error: error.message });
+    }
+
+    res.json(data);
+  } catch (err) {
+    let urlHost = "";
+    try {
+      urlHost = new URL(supabaseUrl).host;
+    } catch (_) {
+      urlHost = "invalid_url";
+    }
+    return res.status(500).json({
+      msg: "Error obteniendo lista",
+      error: err?.message || "fetch failed",
+      code: err?.cause?.code || "",
+      urlHost
+    });
   }
-
-  res.json(data);
 }

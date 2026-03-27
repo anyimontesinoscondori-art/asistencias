@@ -12,21 +12,36 @@ export default async function handler(req, res) {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  const { data, error } = await supabase.from("asistencia").select("*");
+  try {
+    const { data, error } = await supabase.from("asistencia").select("*");
 
-  if (error) {
-    return res
-      .status(500)
-      .json({ msg: "Error exportando asistencia", error: error.message });
+    if (error) {
+      return res
+        .status(500)
+        .json({ msg: "Error exportando asistencia", error: error.message });
+    }
+
+    let csv = "Nombre,Fecha,Hora\n";
+
+    data.forEach((r) => {
+      csv += `${r.nombre},${r.fecha},${r.hora}\n`;
+    });
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", "attachment; filename=asistencia.csv");
+    res.send(csv);
+  } catch (err) {
+    let urlHost = "";
+    try {
+      urlHost = new URL(supabaseUrl).host;
+    } catch (_) {
+      urlHost = "invalid_url";
+    }
+    return res.status(500).json({
+      msg: "Error exportando asistencia",
+      error: err?.message || "fetch failed",
+      code: err?.cause?.code || "",
+      urlHost
+    });
   }
-
-  let csv = "Nombre,Fecha,Hora\n";
-
-  data.forEach((r) => {
-    csv += `${r.nombre},${r.fecha},${r.hora}\n`;
-  });
-
-  res.setHeader("Content-Type", "text/csv");
-  res.setHeader("Content-Disposition", "attachment; filename=asistencia.csv");
-  res.send(csv);
 }

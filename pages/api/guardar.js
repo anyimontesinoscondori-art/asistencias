@@ -26,40 +26,55 @@ export default async function handler(req, res) {
 
   const hoy = new Date().toISOString().split("T")[0];
 
-  const { data: existente, error: errorExistente } = await supabase
-    .from("asistencia")
-    .select("*")
-    .eq("nombre", nombre)
-    .eq("fecha", hoy);
+  try {
+    const { data: existente, error: errorExistente } = await supabase
+      .from("asistencia")
+      .select("*")
+      .eq("nombre", nombre)
+      .eq("fecha", hoy);
 
-  if (errorExistente) {
-    return res.status(500).json({
-      msg: "Error consultando asistencia",
-      error: errorExistente.message
-    });
-  }
-
-  if (existente.length > 0) {
-    return res.json({ msg: "Ya registrado" });
-  }
-
-  const now = new Date();
-
-  const { error: errorInsert } = await supabase.from("asistencia").insert([
-    {
-      nombre,
-      fecha: hoy,
-      hora: now.toTimeString().split(" ")[0],
-      token
+    if (errorExistente) {
+      return res.status(500).json({
+        msg: "Error consultando asistencia",
+        error: errorExistente.message
+      });
     }
-  ]);
 
-  if (errorInsert) {
+    if (existente.length > 0) {
+      return res.json({ msg: "Ya registrado" });
+    }
+
+    const now = new Date();
+
+    const { error: errorInsert } = await supabase.from("asistencia").insert([
+      {
+        nombre,
+        fecha: hoy,
+        hora: now.toTimeString().split(" ")[0],
+        token
+      }
+    ]);
+
+    if (errorInsert) {
+      return res.status(500).json({
+        msg: "Error guardando asistencia",
+        error: errorInsert.message
+      });
+    }
+
+    res.json({ msg: "Registrado" });
+  } catch (err) {
+    let urlHost = "";
+    try {
+      urlHost = new URL(supabaseUrl).host;
+    } catch (_) {
+      urlHost = "invalid_url";
+    }
     return res.status(500).json({
       msg: "Error guardando asistencia",
-      error: errorInsert.message
+      error: err?.message || "fetch failed",
+      code: err?.cause?.code || "",
+      urlHost
     });
   }
-
-  res.json({ msg: "Registrado" });
 }
