@@ -41,25 +41,25 @@ export default function Admin() {
   }, []);
 
   const borrarTodo = async () => {
-    const clave = window.prompt("Clave admin para borrar todo:");
-    if (!clave) return;
-
     const ok = window.confirm(
       "Esto borrara TODOS los registros. Estas seguro?"
     );
     if (!ok) return;
+
+    const ok2 = window.confirm("Ultima confirmacion: borrar todo?");
+    if (!ok2) return;
 
     setBorrando(true);
     setError("");
     try {
       const res = await fetch("/api/borrar", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ adminSecret: clave })
+        headers: { "Content-Type": "application/json" }
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data?.msg || "Error borrando registros");
+        const extra = data?.error ? `: ${data.error}` : "";
+        setError((data?.msg || "Error borrando registros") + extra);
       } else {
         await cargarLista();
       }
