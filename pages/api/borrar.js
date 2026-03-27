@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-  const { error } = await supabase.from("asistencia").delete().neq("id", "");
+  const { error } = await supabase.from("asistencia").delete().neq("id", null);
   if (error) {
     return res.status(500).json({
       msg: "Error borrando",
