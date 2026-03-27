@@ -13,9 +13,9 @@ export default async function handler(req, res) {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  const { nombre, token } = req.body || {};
+  const { nombre, token, deviceId } = req.body || {};
 
-  if (!nombre || !token) {
+  if (!nombre || !token || !deviceId) {
     return res.status(400).json({ msg: "Faltan datos" });
   }
 
@@ -44,6 +44,23 @@ export default async function handler(req, res) {
       return res.json({ msg: "Ya registrado" });
     }
 
+    const { data: existenteDevice, error: errorDevice } = await supabase
+      .from("asistencia")
+      .select("*")
+      .eq("device_id", deviceId)
+      .eq("fecha", hoy);
+
+    if (errorDevice) {
+      return res.status(500).json({
+        msg: "Error verificando dispositivo",
+        error: errorDevice.message
+      });
+    }
+
+    if (existenteDevice.length > 0) {
+      return res.json({ msg: "Este celular ya registro hoy" });
+    }
+
     const now = new Date();
 
     const { error: errorInsert } = await supabase.from("asistencia").insert([
@@ -51,7 +68,8 @@ export default async function handler(req, res) {
         nombre,
         fecha: hoy,
         hora: now.toTimeString().split(" ")[0],
-        token
+        token,
+        device_id: deviceId
       }
     ]);
 

@@ -11,6 +11,7 @@
 - SUPABASE_URL
 - SUPABASE_ANON_KEY
 - QR_SECRET (cualquier texto secreto)
+- ADMIN_SECRET (clave para borrar registros)
 - QR_TOKEN_TTL_MS (opcional, por defecto 7200000)
 
 ## Rutas

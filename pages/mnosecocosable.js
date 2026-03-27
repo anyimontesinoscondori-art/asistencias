@@ -6,6 +6,7 @@ export default function Admin() {
   const [lista, setLista] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
+  const [borrando, setBorrando] = useState(false);
 
   const generarQR = async () => {
     const res = await fetch("/api/token");
@@ -39,6 +40,36 @@ export default function Admin() {
     cargarLista();
   }, []);
 
+  const borrarTodo = async () => {
+    const clave = window.prompt("Clave admin para borrar todo:");
+    if (!clave) return;
+
+    const ok = window.confirm(
+      "Esto borrara TODOS los registros. Estas seguro?"
+    );
+    if (!ok) return;
+
+    setBorrando(true);
+    setError("");
+    try {
+      const res = await fetch("/api/borrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminSecret: clave })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data?.msg || "Error borrando registros");
+      } else {
+        await cargarLista();
+      }
+    } catch (e) {
+      setError("Error borrando registros");
+    } finally {
+      setBorrando(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.card}>
@@ -70,9 +101,14 @@ export default function Admin() {
         <div style={styles.section}>
           <div style={styles.sectionHeader}>
             <h3 style={styles.sectionTitle}>Asistencia</h3>
-            <button onClick={cargarLista} style={styles.smallButton}>
-              {cargando ? "Cargando..." : "Actualizar"}
-            </button>
+            <div style={styles.inlineButtons}>
+              <button onClick={cargarLista} style={styles.smallButton}>
+                {cargando ? "Cargando..." : "Actualizar"}
+              </button>
+              <button onClick={borrarTodo} style={styles.dangerButton}>
+                {borrando ? "Borrando..." : "Borrar todo"}
+              </button>
+            </div>
           </div>
 
           {error && <p style={styles.error}>{error}</p>}
@@ -191,6 +227,19 @@ const styles = {
     color: "white",
     cursor: "pointer",
     fontSize: "12px"
+  },
+  dangerButton: {
+    padding: "6px 10px",
+    borderRadius: "8px",
+    border: "none",
+    background: "#ef4444",
+    color: "white",
+    cursor: "pointer",
+    fontSize: "12px"
+  },
+  inlineButtons: {
+    display: "flex",
+    gap: "8px"
   },
   error: {
     color: "#fca5a5",

@@ -1,5 +1,18 @@
 import { useState } from "react";
 
+function getDeviceId() {
+  if (typeof window === "undefined") return "";
+  const key = "device_id";
+  let id = window.localStorage.getItem(key);
+  if (!id) {
+    const rand = Math.random().toString(36).slice(2);
+    const now = Date.now().toString(36);
+    id = `${now}-${rand}`;
+    window.localStorage.setItem(key, id);
+  }
+  return id;
+}
+
 export default function Home() {
   const [nombre, setNombre] = useState("");
 
@@ -11,12 +24,14 @@ export default function Home() {
   const enviar = async () => {
     if (!nombre) return alert("Escribe tu nombre");
 
+    const deviceId = getDeviceId();
+
     const res = await fetch("/api/guardar", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ nombre, token })
+      body: JSON.stringify({ nombre, token, deviceId })
     });
 
     const data = await res.json();
